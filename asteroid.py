@@ -31,3 +31,5 @@ class Asteroid(CircleShape):
             asteroid1.velocity = asteroid1_angle*1.2
             asteroid2 = Asteroid(self.position.x, self.position.y, new_radius)
             asteroid2.velocity = asteroid2_angle*1.2
+
+
