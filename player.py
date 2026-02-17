@@ -18,6 +18,10 @@ class Player(CircleShape):
         self.respawn_timer = 0.0
         self.invuln_timer = 0.0
 
+        #self.velocity = pygame.Vector2(0, 0)
+        self.acceleration = 800      # thrust strength
+        self.max_speed = 500
+        self.drag = 0.99             # space friction
 
     # in the Player class
     def triangle(self):
@@ -61,10 +65,39 @@ class Player(CircleShape):
         
     
     def move(self, dt):
+        '''
         unit_vector = pygame.Vector2(0, 1)
         rotated_vector = unit_vector.rotate(self.rotation)
         rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
         self.position += rotated_with_speed_vector
+        '''
+        unit_vector = pygame.Vector2(0, 1)
+        forward = unit_vector.rotate(self.rotation)
+
+        # Apply thrust (acceleration)
+        self.velocity += forward * self.acceleration * dt
+
+        # Clamp max speed
+        if self.velocity.length() > self.max_speed:
+            self.velocity.scale_to_length(self.max_speed)
+
+        # Apply drag
+        self.velocity *= self.drag
+
+        # Move
+        self.position += self.velocity * dt
+
+        # Wrap around the screen
+        if self.position.x > SCREEN_WIDTH:
+            self.position.x = 0
+        if self.position.x < 0:
+            self.position.x = SCREEN_WIDTH
+        
+        if self.position.y > SCREEN_HEIGHT:
+            self.position.y = 0
+        if self.position.y < 0:
+            self.position.y = SCREEN_HEIGHT
+        
 
 
     def shoot(self):

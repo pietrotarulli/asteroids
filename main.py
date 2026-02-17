@@ -1,6 +1,7 @@
 from logger import log_state, log_event
 from player import Player
 from asteroid import Asteroid
+from explosion import Explosion
 from asteroidfield import AsteroidField
 from shot import Shot
 import pygame
@@ -23,15 +24,21 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    explode = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable,)
     Shot.containers = (shots, updatable, drawable)
+    Explosion.containers = (explode, updatable, drawable)
 
     
     player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     asteroidfield = AsteroidField()
+    print(asteroidfield)
+    print(explode)
+    print(shots)
+    
 
     while True:
         log_state()
@@ -47,14 +54,7 @@ def main():
         screen.blit(score_surf, (400, 10))
         #asteroidfield.spawn()
         updatable.update(dt)
-        """
-        self.lives = 3
-        self.respawn_delay_s = 1.0
-        self.invuln_time_s = 2.0
-        self.is_respawning = False
-        self.respawn_timer = 0.0
-        self.invuln_timer = 0.0
-        """
+        
         if player1.invuln_timer > 0:
             player1.invuln_timer -= dt
         if player1.is_respawning:
@@ -64,15 +64,15 @@ def main():
                 player1.is_respawning = False
                 player1.invuln_timer = player1.invuln_time_s
 
-        print(f"{player1.invuln_timer} {player1.is_respawning}")
+        #print(f"{player1.invuln_timer} {player1.is_respawning}")
         if player1.invuln_timer <= 0 and not player1.is_respawning:
             for asteroid in asteroids:
                 if asteroid.collides_with(player1):
                     log_event("player_hit")
-                    print("player_hit")
+                    #print("player_hit")
                     player1.lives -= 1
                     log_event("player_hit")
-                    print(f"Player Lives {player1.lives}")
+                    #print(f"Player Lives {player1.lives}")
 
                     if player1.lives < 0:
                         print("Game Over!")
@@ -92,6 +92,14 @@ def main():
                         log_event("asteroid_shot")
                         #asteroid.kill()
                         asteroid.split()
+                        #asteroid.explode()
+                        '''
+                        print(shots)
+                        print(explode)
+                        for bits in explode:
+                            print(bits)
+                            bits.explosion()
+                        '''
                         shot.kill()
                         #if asteroid.radius == ASTEROID_MIN_RADIUS:
                         #    score += 200
@@ -111,3 +119,23 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+"""
+Extending the Project
+You've done all the required steps, but if you'd like to make the game your own, here are some ideas:
+
+Add a scoring system
+Implement multiple lives and respawning
+Add an explosion effect for the asteroids
+Add acceleration to the player movement
+Make the objects wrap around the screen instead of disappearing
+Add a background image
+Create different weapon types
+Make the asteroids lumpy instead of perfectly round
+Make the ship have a triangular hit box instead of a circular one
+Add a shield power-up
+Add a speed power-up
+Add bombs that can be dropped
+"""
