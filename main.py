@@ -42,8 +42,6 @@ def main():
 
     while True:
         log_state()
-        #for event in pygame.event.get():
-        #    pass
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -64,49 +62,26 @@ def main():
                 player1.is_respawning = False
                 player1.invuln_timer = player1.invuln_time_s
 
-        #print(f"{player1.invuln_timer} {player1.is_respawning}")
-        if player1.invuln_timer <= 0 and not player1.is_respawning:
-            for asteroid in asteroids:
+        for asteroid in asteroids:
+            if player1.invuln_timer <= 0 and not player1.is_respawning:
                 if asteroid.collides_with(player1):
                     log_event("player_hit")
-                    #print("player_hit")
                     player1.lives -= 1
-                    log_event("player_hit")
-                    #print(f"Player Lives {player1.lives}")
+                    player1.explosion(50)
 
                     if player1.lives < 0:
                         print("Game Over!")
                         sys.exit()
-                    #player1.kill()
                     player1.is_respawning = True
                     player1.respawn_timer = player1.respawn_delay_s
                     break
-                    #player1.kill()
-                    #time.sleep(5)
-                    #player1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-                    #print("Game over!")
-                    #sys.exit()
-        
-                for shot in shots:
-                    if asteroid.collides_with(shot):
-                        log_event("asteroid_shot")
-                        #asteroid.kill()
-                        asteroid.split()
-                        #asteroid.explode()
-                        '''
-                        print(shots)
-                        print(explode)
-                        for bits in explode:
-                            print(bits)
-                            bits.explosion()
-                        '''
-                        shot.kill()
-                        #if asteroid.radius == ASTEROID_MIN_RADIUS:
-                        #    score += 200
-                        #elif asteroid.radius > ASTEROID_MIN_RADIUS:
-                        #    score += 50
-                        score += {ASTEROID_MIN_RADIUS:200, 40: 100, ASTEROID_MAX_RADIUS:50}[asteroid.radius]
-                                  
+
+            for shot in shots:
+                if asteroid.collides_with(shot):
+                    log_event("asteroid_shot")
+                    asteroid.split()
+                    shot.kill()
+                    score += {ASTEROID_MIN_RADIUS:200, 40: 100, ASTEROID_MAX_RADIUS:50}[asteroid.radius]                              
 
         for object in drawable:
             object.draw(screen)
