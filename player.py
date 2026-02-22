@@ -8,6 +8,16 @@ from constants import PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED
 
 class Player(CircleShape):
 
+    # For sound and music
+    pygame.mixer.init() # For sound and music
+    shoot_sfx = pygame.mixer.Sound("laser_shoot.wav")
+    shoot_sfx.set_volume(0.4)
+    player_hit_sfx = pygame.mixer.Sound("retro_player_hit.wav")
+    player_hit_sfx.set_volume(0.4)
+    thrust_ch = pygame.mixer.Channel(1)
+    thrust_sfx = pygame.mixer.Sound("retro_player_hit.wav")
+    thrust_sfx.set_volume(0.4)
+
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
@@ -42,13 +52,6 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen):
-        '''
-        if self._flash_phase > 0 :
-            self.flashing_hz -= 1
-            if  self.flashing_hz % 4 == 0:
-                self.velocity = pygame.Vector2(0, 0)
-                return
-        '''
         flashing = (self.invuln_timer > 0) #or self.is_respawning
 
         if flashing:
@@ -68,11 +71,6 @@ class Player(CircleShape):
 
     def update(self, dt):
         # When and how to flash during invulerability period
-        '''
-        self._flash_phase = self.invuln_timer
-        if self.invuln_timer > 0 and self._flash_phase > 0:
-            self._flash_phase -= dt
-        '''
         if self.invuln_timer > 0 or self.is_respawning:
             self._flash_phase += dt
         else:
@@ -88,6 +86,11 @@ class Player(CircleShape):
 
         if keys[pygame.K_w]:
             self.move(dt)
+            if not Player.thrust_ch.get_busy():
+                Player.thrust_ch.play(Player.thrust_sfx, loops=-1)
+            else:
+                Player.thrust_ch.stop()
+
         if keys[pygame.K_s]:
             self.move(-dt)
 
@@ -120,9 +123,6 @@ class Player(CircleShape):
         # Move
         self.position += self.velocity * dt
 
-        # Wrap around the screen
-        #self.wrap()
-
 
     def shoot(self):
         if self.shot_cooldown_timer > 0:
@@ -131,14 +131,12 @@ class Player(CircleShape):
         # shot1 = Shot(self.x, self.y, SHOT_RADIUS)
         shot1 = Shot(self.position.x, self.position.y, SHOT_RADIUS)
         shot1.velocity = pygame.Vector2(0, 1).rotate(self.rotation)*PLAYER_SHOOT_SPEED
+        Player.shoot_sfx.play()
 
     def respawn_player(self, screen):
         print("Respawning")
-        #pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
-        #pygame.draw.polygon(screen, "black", self.triangle(), LINE_WIDTH)
         self.position.x = SCREEN_WIDTH / 2
         self.position.y = SCREEN_HEIGHT / 2
-        #pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
         self.draw(screen)
 
     def wrap(self):
@@ -155,6 +153,7 @@ class Player(CircleShape):
         
     def explosion(self, n):
         #self.kill()
+        Player.player_hit_sfx.play()
         self.exploding = True
         for _ in range(n):
             explosion = Explosion(self.position.x, self.position.y, 1)

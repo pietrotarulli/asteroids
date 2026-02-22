@@ -9,9 +9,14 @@ class Explosion(CircleShape):
 
     _instances = weakref.WeakSet()
 
+    pygame.mixer.init() # For sound and music
+    explode_sfx = pygame.mixer.Sound("retro_explosion.wav")
+    explode_sfx.set_volume(0.4)
+
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
         self._instances.add(self)
+        
 
     @classmethod
     def get_instances(cls):
@@ -65,6 +70,7 @@ class Explosion(CircleShape):
             explosion.velocity = pygame.Vector2(1, 0)*EXPLOSION_SPEED
             explosion.velocity = explosion.velocity.rotate(random.randint(-180, 180))
         print("Exploding")
+        Explosion.explode_sfx.play()
 
     def explosion_fade(self):
         for _ in self._instances:

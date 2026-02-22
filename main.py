@@ -13,9 +13,12 @@ def main():
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
+    #pygame.mixer.init() # For sound and music
     pygame.init()
+
     font = pygame.font.Font(None, 36)
     score = 0
+
     game_clock = pygame.time.Clock()
     dt = 0
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -44,6 +47,7 @@ def main():
         log_state()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                Explosion.explosion_fade()
                 return
         screen.fill("black")
         score_surf = font.render(f"Score:{score}", True, "white")
@@ -71,6 +75,7 @@ def main():
 
                     if player1.lives < 0:
                         print("Game Over!")
+                        Explosion.explosion_fade()
                         sys.exit()
                     player1.is_respawning = True
                     player1.respawn_timer = player1.respawn_delay_s
